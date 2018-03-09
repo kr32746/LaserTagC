@@ -137,6 +137,16 @@
 /* timeout value for trickle timer initialization */
 #define TRICKLE_TIMEOUT_VALUE       20
 
+
+
+// UCF SD Team 8 project changes/additions
+// timers
+#define BUZZER_TIMEOUT  500
+#define LT_JOIN_STATE   1
+#define LT_PLAY_STATE   2
+#define LT_MODE_STATE   4
+#define LT_RESET_STATE  3
+
 /* timeout value for join timer */
 #define JOIN_TIMEOUT_VALUE       20
 /* timeout value for config request delay */
@@ -168,6 +178,11 @@ extern mac_Config_t Main_user1Cfg;
 /******************************************************************************
  Local variables
  *****************************************************************************/
+// UCF SD Team 8 project changes/additions
+//
+static Clock_Struct reloadClkStruct;
+static Clock_Handle reloadClkHandle;
+
 
 /* The application's semaphore */
 static ICall_Semaphore collectorSem;
@@ -212,6 +227,17 @@ static const NVINTF_itemID_t nvResetId = NVID_RESET;
 /******************************************************************************
  Global variables
  *****************************************************************************/
+// UCF SD Team 8 project changes/additions
+//
+uint8_t Csf_active_channel = 0;
+uint8_t Csf_game_state = 1;
+uint8_t Csf_game_reload_required = 0;
+uint8_t Csf_game_remaining = 120;
+uint8_t Csf_game_shot_mode = 120;
+uint16_t Csf_game_shots = 0;
+uint16_t Csf_game_hits = 0;
+//
+
 /* Key press parameters */
 uint8_t Csf_keys;
 
@@ -224,6 +250,11 @@ Cllc_states_t savedCllcState = Cllc_states_initWaiting;
 /******************************************************************************
  Local function prototypes
  *****************************************************************************/
+// UCF SD Team 8 project changes/additions
+//
+static void processReloadTimeoutCallback(UArg a0);
+static void displayUpdate(bool newState);
+//
 
 static void processTackingTimeoutCallback(UArg a0);
 static void processBroadcastTimeoutCallback(UArg a0);
@@ -281,7 +312,7 @@ void Csf_init(void *sem)
     /* Initialize the LCD */
     Board_LCD_open();
 
-    LCD_WRITE_STRING("TI Collector", 1);
+    LCD_WRITE_STRING("Laser Skeet  ", 1);
 #if !defined(AUTO_START)
     LCD_WRITE_STRING("Waiting...", 2);
 #endif /* AUTO_START */
@@ -334,11 +365,14 @@ void Csf_processEvents(void)
     /* Did a key press occur? */
     if(Csf_events & CSF_KEY_EVENT)
     {
-        /* LaunchPad only supports KEY_LEFT and KEY_RIGHT */
+/* LaunchPad only supports KEY_LEFT and KEY_RIGHT */
+// UCF SD Team 8 project changes/additions
+// adding cases for game states
 
         if(Csf_keys & KEY_LEFT)
+        {switch(Csf_game_state)
         {
-
+        case LT_JOIN_STATE :
 #if !defined(AUTO_START)
             /* Process the Left Key */
             if(started == false)
@@ -351,62 +385,102 @@ void Csf_processEvents(void)
             else
 #endif /* AUTO_START */
             {
-#if defined(TEST_REMOVE_DEVICE)
-                /*
-                 Remove the first device found in the device list.
-                 Nobody would do something like this, it's just
-                 and example on the use of the device list, remove
-                 function and the black list.
-                 */
-                removeTheFirstDevice();
-#else
-                /*
-                 Send a Toggle LED request to the first device
-                 in the device list
-                 */
-                ApiMac_sAddr_t firstDev;
-
-                firstDev.addr.shortAddr = getTheFirstDevice();
-                if(firstDev.addr.shortAddr != CSF_INVALID_SHORT_ADDR)
+                uint32_t duration;
+                /* Toggle the permit joining */
+                if (permitJoining == true)
                 {
-                    firstDev.addrMode = ApiMac_addrType_short;
-                    Collector_sendToggleLedRequest(&firstDev);
+                    permitJoining = false;
+                    duration = 0;
                 }
-#endif
+                else
+                {
+                    permitJoining = true;
+                    duration = 0xFFFFFFFF;
+                }
+
+                /* Set permit joining */
+                Cllc_setJoinPermit(duration);
+                displayUpdate(false);
             }
+        break;
+
+        case LT_PLAY_STATE :
+            if(!Csf_game_reload_required)
+            {
+            // reduce shots remaining count
+                Csf_game_shots++;
+                Csf_game_remaining--;
+                if((Csf_game_shot_mode == 3) || (Csf_game_remaining == 0))
+                {
+                    Csf_game_reload_required = 1;
+                }
+            // pulse laser PWM
+                Board_Led_control(board_led_type_LASER, board_led_state_LPULSE);
+                displayUpdate(false);
+            }
+        break;
+
+        case LT_RESET_STATE :
+            // reset score
+            Csf_game_shots = 0;
+            Csf_game_hits = 0;
+            // set ammo full
+            // reload - reset shots remain count
+            Csf_game_remaining = Csf_game_shot_mode;
+            Csf_game_state = LT_PLAY_STATE;
+            displayUpdate(true);
+
+        break;
+
+        case LT_MODE_STATE :
+        // change gun type double, 3, or auto
+            switch(Csf_game_shot_mode)
+            {
+            case 2 :
+                Csf_game_shot_mode = 3;
+            break;
+
+            case 3 :
+                Csf_game_shot_mode = 120;
+            break;
+
+            case 120 :
+                Csf_game_shot_mode = 2;
+            break;
+
+            }
+            Csf_game_remaining = Csf_game_shot_mode;
+            displayUpdate(false);
+        break;
+
+        }
         }
 
+        // process next menu/state button
         if(Csf_keys & KEY_RIGHT)
         {
-            uint32_t duration;
-            /* Toggle the permit joining */
-			if (permitJoining == true)
+            Csf_game_state++;
+            if(Csf_game_state > 4)
             {
-                permitJoining = false;
-                duration = 0;
-                LCD_WRITE_STRING("PermitJoin-OFF", 3);
+                Csf_game_state = 1;
             }
-            else
-            {
-                permitJoining = true;
-                duration = 0xFFFFFFFF;
-                LCD_WRITE_STRING("PermitJoin-ON ", 3);
-            }
-
-            /* Set permit joining */
-            Cllc_setJoinPermit(duration);
+            displayUpdate(true);
         }
 
-#if defined(FEATURE_OAD)
-        if(Csf_keys & KEY_LEFT && Csf_keys & KEY_RIGHT)
+        // process reload button
+        if(Csf_keys & KEY_RELOAD)
         {
-            if(hUart != NULL)
+            // reload
+
+
+            if(!Csf_game_remaining)
             {
-                UART_close(hUart);
+             Csf_game_remaining = Csf_game_shot_mode;
             }
-            Oad_markSwitch();
-        }
-#endif /* FEATURE_OAD */
+
+            Csf_game_reload_required = 0;
+       }
+
 
         /* Clear the key press indication */
         Csf_keys = 0;
@@ -419,6 +493,24 @@ void Csf_processEvents(void)
     MTCSF_displayStatistics();
 #endif
 }
+
+// UCF SD Team 8 project changes/additions
+/*!
+ The application calls this when laser hit message is received
+ playerId is for possible future uses for multiple players
+
+ Public function defined in csf.h
+ */
+void Csf_processLaserHit(uint8_t playerId)
+{
+    Csf_game_hits++;
+
+    // play hit tone
+    Board_Led_control(board_led_type_BUZZER, board_led_state_TONE1);
+
+    displayUpdate(false);
+}
+
 
 /*!
  The application calls this function to retrieve the stored
@@ -472,23 +564,16 @@ void Csf_networkUpdate(bool restored, Llc_netInfo_t *pNetworkInfo)
 
         started = true;
 
-        if(restored == false)
-        {
-            LCD_WRITE_STRING("Started", 2);
-        }
-        else
-        {
-            LCD_WRITE_STRING("Restarted", 2);
-        }
-
         if(pNetworkInfo->fh == false)
         {
-            LCD_WRITE_STRING_VALUE("Channel: ", pNetworkInfo->channel, 10, 3);
+            Csf_active_channel = pNetworkInfo->channel;
         }
         else
         {
-            LCD_WRITE_STRING("Freq. Hopping", 3);
+            Csf_active_channel = 0;
         }
+        // UCF Team 8 addition
+        displayUpdate(false);
 
         Board_Led_control(board_led_type_LED1, board_led_state_ON);
 
@@ -497,6 +582,7 @@ void Csf_networkUpdate(bool restored, Llc_netInfo_t *pNetworkInfo)
 #endif
     }
 }
+
 
 /*!
  The application calls this function to indicate that a device
@@ -524,7 +610,7 @@ ApiMac_assocStatus_t Csf_deviceUpdate(ApiMac_deviceDescriptor_t *pDevInfo,
         /* Denied */
         status = ApiMac_assocStatus_panAccessDenied;
 
-        LCD_WRITE_STRING_VALUE("Denied: 0x", pDevInfo->shortAddress, 16, 4);
+        LCD_WRITE_STRING_VALUE("Denied   : 0x", pDevInfo->shortAddress, 16, 6);
     }
     else
     {
@@ -540,17 +626,17 @@ ApiMac_assocStatus_t Csf_deviceUpdate(ApiMac_deviceDescriptor_t *pDevInfo,
 #ifdef NV_RESTORE
             status = ApiMac_assocStatus_panAtCapacity;
 
-            LCD_WRITE_STRING_VALUE("Failed: 0x", pDevInfo->shortAddress,
-                                   16, 4);
+            LCD_WRITE_STRING_VALUE("Failed   : 0x", pDevInfo->shortAddress,
+                                   16, 6);
 #else
             status = ApiMac_assocStatus_success;
 
-            LCD_WRITE_STRING_VALUE("Joined: 0x", pDevInfo->shortAddress, 16, 4);
+            LCD_WRITE_STRING_VALUE("Joined   : 0x", pDevInfo->shortAddress, 16, 6);
 #endif
         }
         else
         {
-            LCD_WRITE_STRING_VALUE("Joined: 0x", pDevInfo->shortAddress, 16, 4);
+            LCD_WRITE_STRING_VALUE("Joined   : 0x", pDevInfo->shortAddress, 16, 6);
         }
     }
 
@@ -573,7 +659,7 @@ bool timeout)
 {
     LCD_WRITE_STRING_VALUE("!Responding: 0x", pDevInfo->shortAddress,
                            16,
-                           5);
+                           6);
 
 #if defined(MT_CSF)
     MTCSF_deviceNotActiveIndCB(pDevInfo, timeout);
@@ -589,7 +675,7 @@ bool timeout)
 void Csf_deviceConfigUpdate(ApiMac_sAddr_t *pSrcAddr, int8_t rssi,
                             Smsgs_configRspMsg_t *pMsg)
 {
-    LCD_WRITE_STRING_VALUE("ConfigRsp: 0x", pSrcAddr->addr.shortAddr, 16, 5);
+    LCD_WRITE_STRING_VALUE("ConfigRsp : 0x", pSrcAddr->addr.shortAddr, 16, 6);
 
 #if defined(MT_CSF)
     MTCSF_configResponseIndCB(pSrcAddr, rssi, pMsg);
@@ -605,9 +691,11 @@ void Csf_deviceConfigUpdate(ApiMac_sAddr_t *pSrcAddr, int8_t rssi,
 void Csf_deviceSensorDataUpdate(ApiMac_sAddr_t *pSrcAddr, int8_t rssi,
                                 Smsgs_sensorMsg_t *pMsg)
 {
-    Board_Led_toggle(board_led_type_LED2);
+    // UCF Team 8
+    // LED 2 use reassigned
+    // Board_Led_toggle(board_led_type_LED2);
 
-    LCD_WRITE_STRING_VALUE("Sensor 0x", pSrcAddr->addr.shortAddr, 16, 6);
+    LCD_WRITE_STRING_VALUE("Sensor    0x", pSrcAddr->addr.shortAddr, 16, 6);
 
 #if defined(MT_CSF)
     MTCSF_sensorUpdateIndCB(pSrcAddr, rssi, pMsg);
@@ -670,6 +758,19 @@ void Csf_stateChangeUpdate(Cllc_states_t state)
     MTCSF_stateChangeIndCB(state);
 #endif
 }
+
+// UCF SD Team 8 project changes/additions
+// init clocks
+void Csf_initializeReloadClock(void){
+    /* Initialize the timers needed for this application */
+    reloadClkHandle = Timer_construct(&reloadClkStruct,
+                                        processReloadTimeoutCallback,
+                                        BUZZER_TIMEOUT,
+                                        0,
+                                        false,
+                                        0);
+}
+
 
 /*!
  Initialize the tracking clock.
@@ -1385,6 +1486,100 @@ bool Csf_isTrackingTimerActive(void)
 /******************************************************************************
  Local Functions
  *****************************************************************************/
+// UCF SD Team 8 project changes/additions
+// not used moved to LED
+/*!
+ * @brief       Relaod callback function.
+ *
+ * @param       a0 - not used
+ */
+static void processReloadTimeoutCallback(UArg a0)
+{
+    (void)a0; /* Parameter is not used */
+
+    // turn buzzer output off
+
+}
+
+// UCF SD Team 8 project changes/additions
+//
+/*!
+ * @brief       Display update function.
+ *
+ * @param       newState - bool indicating new game state
+ */
+
+static void displayUpdate(bool newState)
+{
+
+if(newState)
+{
+// clear lines
+LCD_WRITE_STRING("               ", 2);
+LCD_WRITE_STRING("               ", 3);
+LCD_WRITE_STRING("               ", 4);
+LCD_WRITE_STRING("               ", 5);
+LCD_WRITE_STRING("               ", 6);
+}
+
+switch(Csf_game_state)
+{
+case LT_JOIN_STATE :
+    LCD_WRITE_STRING("Network Control", 2);
+
+    if(started == false)
+    {
+        LCD_WRITE_STRING("Not Started", 3);
+    }
+    else
+    {
+        LCD_WRITE_STRING_VALUE("Using  Chan: ", Csf_active_channel, 10, 3);
+    }
+
+    if (permitJoining == true)
+    {
+        LCD_WRITE_STRING("PermitJoin-ON ", 4);
+    }
+    else
+    {
+        LCD_WRITE_STRING("PermitJoin-OFF ", 4);
+    }
+
+    LCD_WRITE_STRING("Toggle joining?", 5);
+
+    break;
+
+case LT_PLAY_STATE :
+    LCD_WRITE_STRING("PLAY ON        ", 2);
+    LCD_WRITE_STRING_VALUE("Shots  = ", Csf_game_shots, 10, 4);
+    LCD_WRITE_STRING_VALUE("Hits  = ", Csf_game_hits, 10, 5);
+
+    break;
+
+case LT_RESET_STATE :
+    LCD_WRITE_STRING("Score Reset    ", 2);
+    LCD_WRITE_STRING("Reset Score?   ", 4);
+    break;
+
+case LT_MODE_STATE :
+    LCD_WRITE_STRING("Set Shot Mode  ", 2);
+        switch(Csf_game_shot_mode)
+        {
+        case 2 :
+            LCD_WRITE_STRING("Double        ", 4);
+        break;
+        case 3 :
+            LCD_WRITE_STRING("Pump 3 Shot   ", 4);
+        break;
+        case 120 :
+            LCD_WRITE_STRING("120 Semi Auto ", 4);
+        break;
+        }
+    break;
+}
+
+}
+
 
 /*!
  * @brief       Tracking timeout handler function.

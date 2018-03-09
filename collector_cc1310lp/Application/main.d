@@ -2,13 +2,14 @@
 
 obj/main.obj: ../Application/main.c
 obj/main.obj: C:/Users/Kevin/workspace_v7/collector_cc1310lp/Application/subg/features.h
+obj/main.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/PWM.h
+obj/main.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdint.h
 obj/main.obj: C:/ti/xdctools_3_50_03_33_core/packages/xdc/std.h
 obj/main.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdarg.h
 obj/main.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stddef.h
 obj/main.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/kernel/tirtos/packages/ti/targets/arm/elf/std.h
 obj/main.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/kernel/tirtos/packages/ti/targets/arm/elf/M3.h
 obj/main.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/kernel/tirtos/packages/ti/targets/std.h
-obj/main.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdint.h
 obj/main.obj: C:/ti/xdctools_3_50_03_33_core/packages/xdc/runtime/Error.h
 obj/main.obj: C:/ti/xdctools_3_50_03_33_core/packages/xdc/runtime/xdc.h
 obj/main.obj: C:/ti/xdctools_3_50_03_33_core/packages/xdc/runtime/Types.h
@@ -280,13 +281,14 @@ obj/main.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stddef.h
 
 ../Application/main.c: 
 C:/Users/Kevin/workspace_v7/collector_cc1310lp/Application/subg/features.h: 
+C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/PWM.h: 
+C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdint.h: 
 C:/ti/xdctools_3_50_03_33_core/packages/xdc/std.h: 
 C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdarg.h: 
 C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stddef.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/kernel/tirtos/packages/ti/targets/arm/elf/std.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/kernel/tirtos/packages/ti/targets/arm/elf/M3.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/kernel/tirtos/packages/ti/targets/std.h: 
-C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdint.h: 
 C:/ti/xdctools_3_50_03_33_core/packages/xdc/runtime/Error.h: 
 C:/ti/xdctools_3_50_03_33_core/packages/xdc/runtime/xdc.h: 
 C:/ti/xdctools_3_50_03_33_core/packages/xdc/runtime/Types.h: 

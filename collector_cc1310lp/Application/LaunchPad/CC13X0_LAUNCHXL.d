@@ -175,6 +175,14 @@ obj/CC13X0_LAUNCHXL.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/includ
 obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/crypto/CryptoCC26XX.h
 obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/crypto.h
 obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/../inc/hw_crypto.h
+obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/timer/GPTimerCC26XX.h
+obj/CC13X0_LAUNCHXL.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stddef.h
+obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/inc/hw_gpt.h
+obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/event.h
+obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/../inc/hw_event.h
+obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/timer.h
+obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/PWM.h
+obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/pwm/PWMTimerCC26XX.h
 obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/rf/RF.h
 obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/rf_common_cmd.h
 obj/CC13X0_LAUNCHXL.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/rf_mailbox.h
@@ -364,6 +372,14 @@ C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stddef.h:
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/crypto/CryptoCC26XX.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/crypto.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/../inc/hw_crypto.h: 
+C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/timer/GPTimerCC26XX.h: 
+C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stddef.h: 
+C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/inc/hw_gpt.h: 
+C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/event.h: 
+C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/../inc/hw_event.h: 
+C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/timer.h: 
+C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/PWM.h: 
+C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/pwm/PWMTimerCC26XX.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/rf/RF.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/rf_common_cmd.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/devices/cc13x0/driverlib/rf_mailbox.h: 

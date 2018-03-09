@@ -79,16 +79,19 @@ typedef enum
 {
     board_led_type_LED1,
     board_led_type_LED2,
+    board_led_type_MOTION,
 #if !defined(CC13XX_LAUNCHXL) && !defined(CC26XX_LAUNCHXL) && !defined(CC26X2R1_LAUNCHXL) && !defined(CC13X2R1_LAUNCHXL)
     /* The Launchpads only have 2 LEDs */
     board_led_type_LED3,
     board_led_type_LED4,
 #endif
-#if defined(CC13XX_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL)
+    #if defined(CC13XX_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL)
     board_rfSwitch_select,
 #if defined(CC13XX_LAUNCHXL) && !defined(COPROCESSOR)
 #if (CONFIG_RANGE_EXT_MODE == APIMAC_NO_EXTENDER)
     board_rfSwitch_pwr,
+    board_led_type_LASER,
+    board_led_type_BUZZER,
 #endif
 #endif
 #endif
@@ -102,6 +105,9 @@ typedef enum
     board_led_state_ON,
     board_led_state_BLINK,
     board_led_state_BLINKING,
+    board_led_state_LPULSE,
+    board_led_state_TONE1,
+    board_led_state_TONE2,
 } board_led_state;
 
 /******************************************************************************

@@ -11,6 +11,7 @@ obj/board_led.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/kernel/tirtos/packages
 obj/board_led.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdint.h
 obj/board_led.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/PIN.h
 obj/board_led.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdbool.h
+obj/board_led.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/PWM.h
 obj/board_led.obj: C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/ti154stack/icall/src/inc/icall.h
 obj/board_led.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdlib.h
 obj/board_led.obj: C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/linkage.h
@@ -156,6 +157,7 @@ C:/ti/simplelink_cc13x0_sdk_1_50_00_08/kernel/tirtos/packages/ti/targets/std.h:
 C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdint.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/PIN.h: 
 C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdbool.h: 
+C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/drivers/PWM.h: 
 C:/ti/simplelink_cc13x0_sdk_1_50_00_08/source/ti/ti154stack/icall/src/inc/icall.h: 
 C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/stdlib.h: 
 C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.4.LTS/include/linkage.h: 

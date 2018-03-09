@@ -79,6 +79,13 @@ extern "C"
 /******************************************************************************
  Function Prototypes
  *****************************************************************************/
+// UCF SD Team 8 project changes/additions
+//
+extern void Csf_initializeReloadClock(void);
+
+// process the laser hit tasks
+extern void Csf_processLaserHit(uint8_t playerId);
+
 
 /*!
  * @brief       The application calls this function during initialization.

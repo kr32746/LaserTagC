@@ -213,6 +213,9 @@ static void processConfigRetry(void);
 void generateIndirectRampMsg(void);
 #endif
 
+// UCF SD Team 8 project changes/additions
+static void processLaserHitMsg(ApiMac_mcpsDataInd_t *pDataInd);
+
 /******************************************************************************
  Callback tables
  *****************************************************************************/
@@ -521,6 +524,13 @@ static void initializeClocks(void)
     Csf_initializeTrackingClock();
     Csf_initializeConfigClock();
     Csf_initializeBroadcastClock();
+
+
+    // UCF SD Team 8 project changes/additions
+    //
+    Csf_initializeReloadClock();
+
+
 }
 
 /*!
@@ -780,9 +790,15 @@ static void dataIndCB(ApiMac_mcpsDataInd_t *pDataInd)
                 Collector_statistics.sensorMessagesReceived++;
                 break;
 
-            default:
+// UCF SD Team 8 project changes/additions
+//
+           case Smsgs_cmdIds_laserHitMsg:
+               processLaserHitMsg(pDataInd);
+               break;
+
+           default:
                 /* Should not receive other messages */
-                break;
+               break;
         }
     }
 }
@@ -861,6 +877,33 @@ static void processStartEvent(void)
         Cllc_startNetwork();
     }
 }
+
+
+
+// UCF SD Team 8 project changes/additions
+/*!
+ * @brief      Process the laser hit message.
+ *
+ * @param      pDataInd - pointer to the data indication information
+ */
+static void processLaserHitMsg(ApiMac_mcpsDataInd_t *pDataInd)
+{
+    /* Make sure the message is the correct size */
+    if(pDataInd->msdu.len == SMSGS_LASER_HIT_MSG_LEN)
+    {
+        uint8_t playerId;
+        uint8_t *pBuf = pDataInd->msdu.p;
+
+        /* Skip past the command ID */
+        pBuf++;
+
+        playerId = *pBuf;
+
+        /* handle game actions */
+        Csf_processLaserHit(playerId);
+    }
+}
+
 
 /*!
  * @brief      Process the Config Response message.

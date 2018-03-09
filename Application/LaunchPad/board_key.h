@@ -78,6 +78,9 @@ extern "C"
  * @{
  */
 
+// UCF Team 8 addition
+#define KEY_RELOAD            0x01
+
 /*! Select Key ID */
 #define KEY_SELECT            0x01
 /*! Up Key ID */
@@ -90,7 +93,7 @@ extern "C"
 #define KEY_RIGHT             0x10
 
 /*! Debounce timeout in milliseconds */
-#define KEY_DEBOUNCE_TIMEOUT  200
+#define KEY_DEBOUNCE_TIMEOUT  100
 
 /******************************************************************************
  Typedefs

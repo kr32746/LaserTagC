@@ -1,3 +1,6 @@
+// UCF SD Team 8 project changes/additions included in file
+// 2018
+
 /******************************************************************************
 
  @file smsgs.h
@@ -198,6 +201,9 @@ The <b>Sensor Ramp Data Message</b> is defined as:
 #define SMSGS_TOGGLE_LED_REQUEST_MSG_LEN 1
 /*! Toggle Led Request message length (over-the-air length) */
 #define SMSGS_TOGGLE_LED_RESPONSE_MSG_LEN 2
+// UCF SD Team 8 project changes/additions
+// laser hit message
+#define SMSGS_LASER_HIT_MSG_LEN 2
 
 /*!
  Message IDs for Sensor data messages.  When sent over-the-air in a message,
@@ -224,7 +230,10 @@ The <b>Sensor Ramp Data Message</b> is defined as:
     /*! OAD mesages, sent/received from both collector and sensor */
     Smsgs_cmdIds_oad = 9,
     /* Broadcast control msg, sent from the collector to the sensor */
-    Smgs_cmdIds_broadcastCtrlMsg = 10
+    Smgs_cmdIds_broadcastCtrlMsg = 10,
+// UCF SD Team 8 project changes/additions
+// laser hit message
+    Smsgs_cmdIds_laserHitMsg = 11
  } Smsgs_cmdIds_t;
 
 /*!
@@ -340,6 +349,17 @@ typedef struct _Smsgs_toggleledrspmsg_t
     /*! LED State - 0 is off, 1 is on - 1 byte */
     uint8_t ledState;
 } Smsgs_toggleLedRspMsg_t;
+
+
+// UCF SD Team 8 project changes/additions
+// laser hit meaasge sent from sensor to collector when laser is detected
+typedef struct _Smsgs_laserHitmsg_t
+{
+    /*! Command ID - 1 byte */
+    Smsgs_cmdIds_t cmdId;
+    /*! LED State - 0 is off, 1 is on - 1 byte */
+    uint8_t playerId;
+} Smsgs_laserHitMsg_t;
 
 /*!
  Temp Sensor Field

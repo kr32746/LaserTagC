@@ -48,6 +48,9 @@
  Includes
  *****************************************************************************/
 
+// UCF Team 8 included for PWM
+#include <ti/drivers/PWM.h>
+
 #include <xdc/std.h>
 
 #include <xdc/runtime/Error.h>
@@ -346,6 +349,10 @@ Void main()
      following TI-RTOS convention
      */
     PIN_init(BoardGpioInitTable);
+
+    // UCF Team 8
+    // add PWM init
+    PWM_init();
 
 #if defined(FEATURE_OAD)
     SPI_init();

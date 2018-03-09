@@ -377,6 +377,55 @@ const CryptoCC26XX_Config CryptoCC26XX_config[] = {
  *  ========================== Crypto end ======================================
  */
 
+// UCF SD Team 8 project changes/additions
+/*
+ *  =============================== GPTimer ===============================
+ *  Remove unused entries to reduce flash usage both in Board.c and Board.h
+ */
+#include <ti/drivers/timer/GPTimerCC26XX.h>
+
+GPTimerCC26XX_Object gptimerCC26XXObjects[4];
+
+const GPTimerCC26XX_HWAttrs gptimerCC26xxHWAttrs[4] = {
+    { .baseAddr = GPT0_BASE, .intNum = INT_GPT0A, .intPriority = (~0), .powerMngrId = PowerCC26XX_PERIPH_GPT0, .pinMux = GPT_PIN_0A, },
+    { .baseAddr = GPT0_BASE, .intNum = INT_GPT0B, .intPriority = (~0), .powerMngrId = PowerCC26XX_PERIPH_GPT0, .pinMux = GPT_PIN_0B, },
+    { .baseAddr = GPT1_BASE, .intNum = INT_GPT1A, .intPriority = (~0), .powerMngrId = PowerCC26XX_PERIPH_GPT1, .pinMux = GPT_PIN_1A, },
+    { .baseAddr = GPT1_BASE, .intNum = INT_GPT1B, .intPriority = (~0), .powerMngrId = PowerCC26XX_PERIPH_GPT1, .pinMux = GPT_PIN_1B, },
+};
+
+const GPTimerCC26XX_Config GPTimerCC26XX_config[4] = {
+    { &gptimerCC26XXObjects[CC13X0_LAUNCHXL_GPTIMER0], &gptimerCC26xxHWAttrs[Board_GPTIMER0A], GPT_A },
+    { &gptimerCC26XXObjects[CC13X0_LAUNCHXL_GPTIMER0], &gptimerCC26xxHWAttrs[Board_GPTIMER0B], GPT_B },
+    { &gptimerCC26XXObjects[CC13X0_LAUNCHXL_GPTIMER1], &gptimerCC26xxHWAttrs[Board_GPTIMER1A], GPT_A },
+    { &gptimerCC26XXObjects[CC13X0_LAUNCHXL_GPTIMER1], &gptimerCC26xxHWAttrs[Board_GPTIMER1B], GPT_B },
+};
+
+// UCF SD Team 8 project changes/additions
+/*
+ *  =============================== PWM ===============================
+ *  Remove unused entries to reduce flash usage both in Board.c and Board.h
+ */
+#include <ti/drivers/PWM.h>
+#include <ti/drivers/pwm/PWMTimerCC26XX.h>
+
+PWMTimerCC26XX_Object pwmtimerCC26xxObjects[4];
+
+const PWMTimerCC26XX_HwAttrs pwmtimerCC26xxHWAttrs[4] = {
+    { .pwmPin = Board_PWMPIN0, .gpTimerUnit = Board_GPTIMER0A },
+    { .pwmPin = Board_PWMPIN1, .gpTimerUnit = Board_GPTIMER0B },
+    { .pwmPin = Board_PWMPIN2, .gpTimerUnit = Board_GPTIMER1A },
+    { .pwmPin = Board_PWMPIN3, .gpTimerUnit = Board_GPTIMER1B },
+};
+
+const PWM_Config PWM_config[4] = {
+    { &PWMTimerCC26XX_fxnTable, &pwmtimerCC26xxObjects[Board_PWM0], &pwmtimerCC26xxHWAttrs[Board_PWM0] },
+    { &PWMTimerCC26XX_fxnTable, &pwmtimerCC26xxObjects[Board_PWM1], &pwmtimerCC26xxHWAttrs[Board_PWM1] },
+    { &PWMTimerCC26XX_fxnTable, &pwmtimerCC26xxObjects[Board_PWM2], &pwmtimerCC26xxHWAttrs[Board_PWM2] },
+    { &PWMTimerCC26XX_fxnTable, &pwmtimerCC26xxObjects[Board_PWM3], &pwmtimerCC26xxHWAttrs[Board_PWM3] },
+};
+
+const uint_least8_t PWM_count = 4;
+
 
 /*
  *  ========================= RF driver begin ==================================

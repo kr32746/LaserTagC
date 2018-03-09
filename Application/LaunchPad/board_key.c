@@ -77,6 +77,7 @@ static Board_Key_keysPressedCB_t appKeyChangeHandler = NULL;
 static PIN_Config keyPinTable[] = {
       Board_BUTTON0 | PIN_INPUT_EN | PIN_PULLUP | PIN_IRQ_NEGEDGE,
       Board_BUTTON1 | PIN_INPUT_EN | PIN_PULLUP | PIN_IRQ_NEGEDGE,
+      Board_DIO15 | PIN_INPUT_EN | PIN_PULLUP | PIN_IRQ_NEGEDGE,
       PIN_TERMINATE /* Terminate list */
     };
 
@@ -144,6 +145,10 @@ static void board_key_keyFxn(PIN_Handle keyPinHandle, PIN_Id keyPinId)
     {
         keysPressed |= KEY_RIGHT;
     }
+    else if(keyPinId == Board_DIO15)
+    {
+        keysPressed |= KEY_RELOAD;
+    }
 
     if(Timer_isActive(&keyChangeClock) != true)
     {
@@ -185,6 +190,11 @@ static uint8_t board_key_getValues(void)
     if(PIN_getInputValue(Board_BUTTON1) == false)
     {
         keys |= KEY_RIGHT;
+    }
+
+    if(PIN_getInputValue(Board_DIO15) == false)
+    {
+        keys |= KEY_RELOAD;
     }
 
     return(keys);
