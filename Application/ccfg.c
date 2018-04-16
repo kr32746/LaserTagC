@@ -47,5 +47,8 @@
  *        remain unmodified.
  */
 
+// #define SET_CCFG_MODE_CONF_SCLK_LF_OPTION            0x2        // LF xosc
+// #define SET_CCFG_MODE_CONF_SCLK_LF_OPTION            0x3        // LF RCOSC
+
 #include <ti/devices/DeviceFamily.h>
 #include DeviceFamily_constructPath(startup_files/ccfg.c)

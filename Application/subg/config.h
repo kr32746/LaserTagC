@@ -163,9 +163,9 @@ extern "C"
  APIMAC_STD_ETSI_863_PHY_3 (50kbps/2-FSK/863MHz band) has channels 0 - 33.
  APIMAC_GENERIC_CHINA_433_PHY_128 (50kbps/2-FSK/433MHz band) has channels 0 - 6.
 */
-#define CONFIG_CHANNEL_MASK           { 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, \
-                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-                                        0x00, 0x00, 0xFF, 0xFF, 0x00 }
+#define CONFIG_CHANNEL_MASK           { 0x00, 0x01, 0x08, 0x21, 0x84, 0x00, \
+                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x80, \
+                                        0x10, 0x00, 0x00, 0x00, 0x00 }
 /*!
  Channel mask used when CONFIG_FH_ENABLE is true.
  Represents the list of channels on which the device can hop.
@@ -173,9 +173,9 @@ extern "C"
  It is represented as a bit string with LSB representing Ch0.
  e.g., 0x01 0x10 represents Ch0 and Ch12 are included.
  */
-#define CONFIG_FH_CHANNEL_MASK        { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, \
-                                        0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, \
-                                        0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
+#define CONFIG_FH_CHANNEL_MASK        { 0x00, 0x01, 0x08, 0x21, 0x84, 0x00, \
+                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x80, \
+                                        0x10, 0x00, 0x00, 0x00, 0x00 }
 
 /*!
  List of channels to target the Async frames
@@ -274,7 +274,7 @@ extern "C"
 #if ((CONFIG_PHY_ID == APIMAC_GENERIC_CHINA_433_PHY_128) || (CONFIG_PHY_ID == APIMAC_GENERIC_CHINA_LRM_433_PHY_130))
 #define CONFIG_TRANSMIT_POWER        14
 #else
-#define CONFIG_TRANSMIT_POWER        12
+#define CONFIG_TRANSMIT_POWER        9
 #endif
 #endif
 

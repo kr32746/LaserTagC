@@ -67,6 +67,9 @@ static uint8_t keysPressed;
 /* Key debounce clock */
 static Clock_Struct keyChangeClock;
 
+// UCF team 8 project addition for timed action delay for simulated flight time
+static Clock_Struct sendDelayClock;
+
 /* Pointer to application callback */
 static Board_Key_keysPressedCB_t appKeyChangeHandler = NULL;
 
@@ -93,6 +96,9 @@ static PIN_Handle keyPinHandle;
 static void board_key_changeHandler(UArg a0);
 static void board_key_keyFxn(PIN_Handle keyPinHandle, PIN_Id keyPinId);
 static uint8_t board_key_getValues(void);
+
+// UCF Team 8 addition
+static void board_key_delayedSendHandler(UArg a0);
 
 /******************************************************************************
  Public Functions
@@ -121,6 +127,11 @@ uint8_t Board_Key_initialize(Board_Key_keysPressedCB_t appKeyCB)
                     (KEY_DEBOUNCE_TIMEOUT),
                     0, false, 0);
 
+    // UCF Team 8 addition - laser delay timer
+    Timer_construct(&sendDelayClock, board_key_delayedSendHandler,
+                    (KEY_DELAY_TIMEOUT),
+                    0, false, 0);
+
     /* Set the application callback */
     appKeyChangeHandler = appKeyCB;
 
@@ -136,7 +147,7 @@ uint8_t Board_Key_initialize(Board_Key_keysPressedCB_t appKeyCB)
 static void board_key_keyFxn(PIN_Handle keyPinHandle, PIN_Id keyPinId)
 {
     (void)keyPinHandle;
-
+/*
     if(keyPinId == Board_BUTTON0)
     {
         keysPressed |= KEY_LEFT;
@@ -144,6 +155,8 @@ static void board_key_keyFxn(PIN_Handle keyPinHandle, PIN_Id keyPinId)
     else if(keyPinId == Board_BUTTON1)
     {
         keysPressed |= KEY_RIGHT;
+
+
     }
     else if(keyPinId == Board_DIO15)
     {
@@ -154,23 +167,91 @@ static void board_key_keyFxn(PIN_Handle keyPinHandle, PIN_Id keyPinId)
     {
         Timer_start(&keyChangeClock);
     }
+*/
+
+    // if laser control - delayed send for simulated shot flight time
+    // if BUTTON0 and not set to send
+     if(  (keyPinId == Board_BUTTON0) &&
+         !(keysPressed & KEY_LEFT) )
+     {
+        keysPressed |= KEY_LEFT;
+        Timer_start(&sendDelayClock);
+     }
+     // if BUTTON1 and not set to send
+     else if( (keyPinId == Board_BUTTON1) &&
+             !(keysPressed & KEY_RIGHT) )
+     {
+        keysPressed |= KEY_RIGHT;
+        Timer_start(&keyChangeClock);
+     }
+     // if BUTTON3 and not set to send
+     else if( (keyPinId == Board_DIO15) &&
+         !(keysPressed & KEY_RELOAD) )
+     {
+        keysPressed |= KEY_RELOAD;
+        Timer_start(&keyChangeClock);
+     }
+
+
 }
+
+/*!
+ * UCF Team 8 addition
+ * @brief       Handler for Delayed action for Laser flight time simulation
+ *
+ * @param       UArg a0 - ignored
+ *
+ * send key notification after delay
+ */
+static void board_key_delayedSendHandler(UArg a0)
+{
+    if(PIN_getInputValue(Board_BUTTON0) == false)
+    {
+    if(appKeyChangeHandler != NULL)
+    {
+        /* Notify the application */
+        (*appKeyChangeHandler)(KEY_LEFT);
+    }
+
+    // start debounce timer
+    Timer_start(&keyChangeClock);
+    }
+    else
+    {
+        keysPressed = (keysPressed & ~KEY_LEFT);
+    }
+}
+
 
 /*!
  * @brief       Handler for key change
  *
  * @param       UArg a0 - ignored
+ *
+ * executes on debounce timeout
  */
 static void board_key_changeHandler(UArg a0)
 {
-    if(appKeyChangeHandler != NULL)
+    uint8_t keys;
+    keys = board_key_getValues();
+
+    // clear button0 it is sent early with special timing,
+    keysPressed = (keysPressed & ~KEY_LEFT);
+    keys = (keys & ~KEY_LEFT);
+
+    // confirm button to avoid double hit on button release
+    if(keys == keysPressed )
     {
         /* Notify the application */
-        (*appKeyChangeHandler)(keysPressed);
-
-        /* Clear keys */
-        keysPressed = 0;
+        if((appKeyChangeHandler != NULL) && keys)
+        {
+            (*appKeyChangeHandler)(keysPressed);
+        }
     }
+
+    /* Clear keys to allow new key press (Debounce time expired)*/
+    keysPressed = 0;
+
 }
 
 /*!

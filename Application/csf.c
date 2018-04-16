@@ -236,6 +236,7 @@ uint8_t Csf_game_remaining = 120;
 uint8_t Csf_game_shot_mode = 120;
 uint16_t Csf_game_shots = 0;
 uint16_t Csf_game_hits = 0;
+uint32_t Csf_game_percent = 0;
 //
 
 /* Key press parameters */
@@ -313,9 +314,11 @@ void Csf_init(void *sem)
     Board_LCD_open();
 
     LCD_WRITE_STRING("Laser Skeet  ", 1);
+
 #if !defined(AUTO_START)
-    LCD_WRITE_STRING("Waiting...", 2);
+    LCD_WRITE_STRING("Waiting...", 6);
 #endif /* AUTO_START */
+    displayUpdate(true);
 
     Board_Led_initialize();
 
@@ -387,15 +390,15 @@ void Csf_processEvents(void)
             {
                 uint32_t duration;
                 /* Toggle the permit joining */
-                if (permitJoining == true)
-                {
-                    permitJoining = false;
-                    duration = 0;
-                }
-                else
+                if ((permitJoining == false) && started)
                 {
                     permitJoining = true;
                     duration = 0xFFFFFFFF;
+                }
+                else
+                {
+                    permitJoining = false;
+                    duration = 0;
                 }
 
                 /* Set permit joining */
@@ -405,7 +408,7 @@ void Csf_processEvents(void)
         break;
 
         case LT_PLAY_STATE :
-            if(!Csf_game_reload_required)
+            if(!Csf_game_reload_required && Csf_game_remaining)
             {
             // reduce shots remaining count
                 Csf_game_shots++;
@@ -450,6 +453,7 @@ void Csf_processEvents(void)
 
             }
             Csf_game_remaining = Csf_game_shot_mode;
+            Csf_game_reload_required = 0;
             displayUpdate(false);
         break;
 
@@ -470,15 +474,16 @@ void Csf_processEvents(void)
         // process reload button
         if(Csf_keys & KEY_RELOAD)
         {
-            // reload
+            // reload double & 120 shot modes reload anytime to full capacity
+            // 3 shot pump requires reload between each shot & again to reload to 3
 
-
-            if(!Csf_game_remaining)
+            if((Csf_game_shot_mode != 3) ||
+               ((Csf_game_shot_mode == 3) &&  (Csf_game_reload_required == 0)))
             {
              Csf_game_remaining = Csf_game_shot_mode;
             }
-
             Csf_game_reload_required = 0;
+            displayUpdate(true);
        }
 
 
@@ -609,8 +614,10 @@ ApiMac_assocStatus_t Csf_deviceUpdate(ApiMac_deviceDescriptor_t *pDevInfo,
     {
         /* Denied */
         status = ApiMac_assocStatus_panAccessDenied;
-
-        LCD_WRITE_STRING_VALUE("Denied   : 0x", pDevInfo->shortAddress, 16, 6);
+        if(Csf_game_state == LT_JOIN_STATE)
+        {
+        LCD_WRITE_STRING_VALUE("Denied   : 0x", pDevInfo->shortAddress, 16, 7);
+        }
     }
     else
     {
@@ -625,18 +632,23 @@ ApiMac_assocStatus_t Csf_deviceUpdate(ApiMac_deviceDescriptor_t *pDevInfo,
         {
 #ifdef NV_RESTORE
             status = ApiMac_assocStatus_panAtCapacity;
-
-            LCD_WRITE_STRING_VALUE("Failed   : 0x", pDevInfo->shortAddress,
-                                   16, 6);
+            if(Csf_game_state == LT_JOIN_STATE)
+            {
+            LCD_WRITE_STRING_VALUE("Failed     : 0x", pDevInfo->shortAddress,
+                                   16, 7);
+            }
 #else
             status = ApiMac_assocStatus_success;
 
-            LCD_WRITE_STRING_VALUE("Joined   : 0x", pDevInfo->shortAddress, 16, 6);
+            LCD_WRITE_STRING_VALUE("Joined     : 0x", pDevInfo->shortAddress, 16, 6);
 #endif
         }
         else
         {
-            LCD_WRITE_STRING_VALUE("Joined   : 0x", pDevInfo->shortAddress, 16, 6);
+            if(Csf_game_state == LT_JOIN_STATE)
+            {
+            LCD_WRITE_STRING_VALUE("Joined     : 0x", pDevInfo->shortAddress, 16, 7);
+            }
         }
     }
 
@@ -657,9 +669,11 @@ ApiMac_assocStatus_t Csf_deviceUpdate(ApiMac_deviceDescriptor_t *pDevInfo,
 void Csf_deviceNotActiveUpdate(ApiMac_deviceDescriptor_t *pDevInfo,
 bool timeout)
 {
+    if(Csf_game_state == LT_JOIN_STATE)
+    {
     LCD_WRITE_STRING_VALUE("!Responding: 0x", pDevInfo->shortAddress,
-                           16,
-                           6);
+                           16, 7);
+    }
 
 #if defined(MT_CSF)
     MTCSF_deviceNotActiveIndCB(pDevInfo, timeout);
@@ -675,7 +689,10 @@ bool timeout)
 void Csf_deviceConfigUpdate(ApiMac_sAddr_t *pSrcAddr, int8_t rssi,
                             Smsgs_configRspMsg_t *pMsg)
 {
-    LCD_WRITE_STRING_VALUE("ConfigRsp : 0x", pSrcAddr->addr.shortAddr, 16, 6);
+    if(Csf_game_state == LT_JOIN_STATE)
+    {
+    LCD_WRITE_STRING_VALUE("ConfigRsp  : 0x", pSrcAddr->addr.shortAddr, 16, 7);
+    }
 
 #if defined(MT_CSF)
     MTCSF_configResponseIndCB(pSrcAddr, rssi, pMsg);
@@ -694,8 +711,10 @@ void Csf_deviceSensorDataUpdate(ApiMac_sAddr_t *pSrcAddr, int8_t rssi,
     // UCF Team 8
     // LED 2 use reassigned
     // Board_Led_toggle(board_led_type_LED2);
-
-    LCD_WRITE_STRING_VALUE("Sensor    0x", pSrcAddr->addr.shortAddr, 16, 6);
+    if(Csf_game_state == LT_JOIN_STATE)
+    {
+    LCD_WRITE_STRING_VALUE("Sensor     : 0x", pSrcAddr->addr.shortAddr, 16, 7);
+    }
 
 #if defined(MT_CSF)
     MTCSF_sensorUpdateIndCB(pSrcAddr, rssi, pMsg);
@@ -1515,11 +1534,13 @@ static void displayUpdate(bool newState)
 if(newState)
 {
 // clear lines
-LCD_WRITE_STRING("               ", 2);
-LCD_WRITE_STRING("               ", 3);
-LCD_WRITE_STRING("               ", 4);
-LCD_WRITE_STRING("               ", 5);
-LCD_WRITE_STRING("               ", 6);
+LCD_WRITE_STRING("                ", 2);
+LCD_WRITE_STRING("                ", 3);
+LCD_WRITE_STRING("                ", 4);
+LCD_WRITE_STRING("                ", 5);
+LCD_WRITE_STRING("                ", 6);
+LCD_WRITE_STRING("                ", 7);
+LCD_WRITE_STRING("                ", 8);
 }
 
 switch(Csf_game_state)
@@ -1550,10 +1571,15 @@ case LT_JOIN_STATE :
     break;
 
 case LT_PLAY_STATE :
-    LCD_WRITE_STRING("PLAY ON        ", 2);
-    LCD_WRITE_STRING_VALUE("Shots  = ", Csf_game_shots, 10, 4);
-    LCD_WRITE_STRING_VALUE("Hits  = ", Csf_game_hits, 10, 5);
+    Csf_game_percent = (Csf_game_hits * 100)/Csf_game_shots;
 
+    LCD_WRITE_STRING("PLAY ON        ", 2);
+    LCD_WRITE_STRING_VALUE("Shots     = ", Csf_game_shots, 10, 4);
+    LCD_WRITE_STRING_VALUE("Hits      = ", Csf_game_hits, 10, 5);
+    LCD_WRITE_STRING("                ", 6);
+    LCD_WRITE_STRING_VALUE("Percent   = ", Csf_game_percent, 10, 6);
+    LCD_WRITE_STRING("                ", 7);
+    LCD_WRITE_STRING_VALUE("Remaining = ", Csf_game_remaining, 10, 7);
     break;
 
 case LT_RESET_STATE :

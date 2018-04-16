@@ -95,6 +95,9 @@ extern "C"
 /*! Debounce timeout in milliseconds */
 #define KEY_DEBOUNCE_TIMEOUT  100
 
+// UCF Team 8 addition
+#define KEY_DELAY_TIMEOUT  80
+
 /******************************************************************************
  Typedefs
  *****************************************************************************/

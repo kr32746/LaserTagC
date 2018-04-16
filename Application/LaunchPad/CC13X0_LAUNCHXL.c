@@ -113,7 +113,7 @@ const PIN_Config BoardGpioInitTable[] = {
     Board_SPI0_MOSI | PIN_INPUT_EN | PIN_PULLDOWN,                                            /* SPI master out - slave in */
     Board_SPI0_MISO | PIN_INPUT_EN | PIN_PULLDOWN,                                            /* SPI master in - slave out */
     Board_SPI0_CLK | PIN_INPUT_EN | PIN_PULLDOWN,                                             /* SPI clock */
-
+    Board_DIO28_ANALOG | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MED,  /* PWM laser dirver */
     PIN_TERMINATE
 };
 #endif /* POWER_MEAS */
@@ -479,7 +479,8 @@ const DisplayUart_HWAttrs displayUartHWAttrs = {
 DisplaySharp_Object displaySharpObject;
 
 #ifndef BOARD_DISPLAY_SHARP_SIZE
-#define BOARD_DISPLAY_SHARP_SIZE    96 // 96->96x96 is the most common board, alternative is 128->128x128.
+// UCF Team 8 change to 128 size
+#define BOARD_DISPLAY_SHARP_SIZE   128 // 96->96x96 is the most common board, alternative is 128->128x128.
 #endif
 static uint8_t sharpDisplayBuf[BOARD_DISPLAY_SHARP_SIZE * BOARD_DISPLAY_SHARP_SIZE / 8];
 

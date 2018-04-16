@@ -81,7 +81,7 @@
 #define LASER_TIMEOUT   100    /* in milliseconds */
 #endif
 #if !defined(LASER_PERIOD)
-#define LASER_PERIOD   5000
+#define LASER_PERIOD   1000
 #endif
 #if !defined(TONE1_PERIOD)
 #define TONE1_PERIOD   1000
@@ -142,9 +142,7 @@ static PIN_Config ledPinTable[] =
             | PIN_DRVSTR_MAX, /* LED1 initially off */
     Board_LED1 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL
             | PIN_DRVSTR_MAX, /* LED2 initially off */
-//    Board_DIO25_ANALOG | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL
-//            | PIN_DRVSTR_MAX, /* bUZZER initially off */
-    Board_DIO21 | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL
+    Board_DIO26_ANALOG | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL
             | PIN_DRVSTR_MAX, /* MOtion initially off */
 #if defined(CC13XX_LAUNCHXL) || defined(CC13X2R1_LAUNCHXL)
 #if !defined(FREQ_2_4G)
@@ -584,7 +582,7 @@ static unsigned int board_led_convertLedType(board_led_type led)
     }
     else if (led == board_led_type_MOTION)
     {
-        return(Board_DIO21);
+        return(Board_DIO26_ANALOG);
     }
     return(Board_LED1);
 }
